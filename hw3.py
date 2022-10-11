@@ -1,6 +1,5 @@
 class CountVectorizer:
     """gets unique words from input, creates document-term matrix"""
-    stop_words = ('the', 'a', 'and')
 
     def __init__(self, input=[], lowercase=True, stop_words=None):
         self.lowercase = lowercase
