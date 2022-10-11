@@ -1,10 +1,10 @@
 class CountVectorizer:
     """gets unique words from input, creates document-term matrix"""
 
-    def __init__(self, input=[], lowercase=True, stop_words=None):
+    def __init__(self, input=[], lowercase=True):
         self.lowercase = lowercase
         self.input = input
-        self.stop_words = stop_words
+        self.stop_words = ("the", "a", "and")
         self._vocabulary = {}
 
     def fit_transform(self):
@@ -19,15 +19,16 @@ class CountVectorizer:
             for word in line.split():
                 if self.lowercase:
                     word = word.lower()
-                if word not in self._vocabulary:
-                    self._vocabulary[word] = max_i
-                    for elem in output[:-1]:
-                        elem.append(0)
-                    max_i += 1
+                if word not in self.stop_words:
+                    if word not in self._vocabulary:
+                        self._vocabulary[word] = max_i
+                        for elem in output[:-1]:
+                            elem.append(0)
+                        max_i += 1
 
-                    output[i].append(1)
-                else:
-                    output[i][self._vocabulary[word]] += 1
+                        output[i].append(1)
+                    else:
+                        output[i][self._vocabulary[word]] += 1
         return output
 
     def get_feature_names(self):
