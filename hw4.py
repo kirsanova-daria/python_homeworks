@@ -3,57 +3,62 @@ import keyword
 
 
 class ColorizeMixin:
-    def __repr__(self):
-        text = super().__repr__()
-        color = super().repr_color_code
-        return f"\033[1;{color};40m {text}  \n"
-
-
-class Advert(ColorizeMixin):
+    """ изменяет цвет текста при вызове print() """
     repr_color_code = 33
 
-    def __init__(self, input: dict):
-        for key, value in input.items():
+    def __repr__(self) -> str:
+        text = f'{self.title} | {self.price} ₽'
+        return f"\033[1;{self.repr_color_code};40m {text}  \n"
+
+
+class Base:
+    """ динамически создает аттрибуты для Advert """
+    def __init__(self, attr: dict) -> None:
+        for key, value in attr.items():
             if isinstance(value, dict):
-                setattr(self, key, Advert(value))
+                setattr(self, key, Base(value))
             else:
-                if key == 'price':
-                    setattr(self, f'_{key}', value)
-                    setattr(self, key, value)
-                elif keyword.iskeyword(key):
+                if keyword.iskeyword(key):
                     setattr(self, f'{key}_', value)
                 else:
                     setattr(self, key, value)
 
+    def __repr__(self) -> str:
+        return f'{self.title} | {self.price} ₽'
+
+
+class Advert(ColorizeMixin, Base):
+    def __init__(self, input: dict) -> None:
+        self.input = input
+        if 'title' not in input.keys():
+            raise ValueError
+        super().__init__(self.input)
+
     @property
-    def price(self):
-        if '_price' not in self.__dict__.keys():
+    def price(self) -> int:
+        if 'price' not in self.input.keys():
             return 0
         else:
             return self._price
 
     @price.setter
-    def price(self, value):
+    def price(self, value: int) -> None:
         if value < 0:
             raise ValueError('price must be >= 0')
         self._price = value
-
-    def __repr__(self):
-        return f'{self.title} | {self.price} ₽'
 
 
 if __name__ == '__main__':
     corgi_str = """{
                 "title": "Вельш-корги",
-                "price": 1000,
                 "class": "dogs",
                 "location": {
-                "address": "сельское поселение Ельдигинское,
-                поселок санатория Тишково, 25"
+                "address": "сельское поселение Ельдигинское, поселок санатория Тишково, 25"
                 }
                 }"""
     corgi = json.loads(corgi_str)
     corgi_ad = Advert(corgi)
     print(corgi_ad.location.address)
     print(corgi_ad.class_)
+    print(corgi_ad.price)
     print(corgi_ad)
