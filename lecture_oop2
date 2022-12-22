@@ -1,0 +1,26 @@
+class BasePokemon:
+    def __init__(self, name: str, poketype: str):
+        self.name = name
+        self.poketype = poketype
+
+    def to_str(self):
+        return f'{self.name}/{self.poketype}'
+
+
+class EmojiMixin:
+    icons = {'grass': '🌿', 'fire': '🔥', 'water': '🌊', 'electric': '⚡'}
+
+    def __str__(self):
+        type = self.poketype
+        for cat, icon in self.icons.items():
+            if type == cat:
+                return f'{self.name}/{icon}'
+
+
+class Pokemon(EmojiMixin, BasePokemon):
+    pass
+
+
+if __name__ == '__main__':
+    pikachu = Pokemon(name='Pikachu', poketype='electric')
+    print(pikachu)
